@@ -74,7 +74,13 @@ th, td {
         <input type="button" value="Submit" onclick="postBoerderijDier()">
     </form>
 </div>
+
 <div id="oink"></div>
+
+<div id="verwijderOink">
+    <input type="text" id="delDier" placeholder="Typ hier het ID van het dier">
+    <button id="del" onclick="deleteBoerderijDier()">Haal het dier met de ID uit de database</button>
+</div>
 
 
 <script>
@@ -91,14 +97,13 @@ th, td {
                 
 
                 document.getElementById("oink").innerHTML = string1;
+                
             }
             bd.open("GET", "http://localhost:8082/boerderijdier", true);
             bd.send();
         }
 
-       
-
-    function postBoerderijDier(){
+        function postBoerderijDier(){
         var diersoort = document.getElementById('diersoort').value;
         var naam = document.getElementById('naam').value;
         var geslacht = document.getElementById('geslacht').value;
@@ -124,12 +129,25 @@ th, td {
         xhr.send(bd);
     }
     
+    function deleteBoerderijDier(){
+        var deletebd = document.getElementById('delDier').value;
+        var url = "http://localhost:8082/boerderijdier/";
+        
+        var xhr = new XMLHttpRequest();
+        
+        xhr.open("DELETE", url+deletebd, true);
+        xhr.onload = function(){
+            var boerderijdier = JSON.parse(xhr.responseText);
+        }
+
+        xhr.onreadystatechange = function() {
+            showBoerderijDier();
+        }
+        xhr.send();
+    }
+
     window.onload = showBoerderijDier;
 
 </script>
-
-
-
-
 </body>
 </html>
