@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title> Emi's Kinderboerderij</title>
+</head>
+<style>
+table, th, td {
+    border: 1px solid black;
+  }
+th, td {
+    border: 1px soli #dddddd;
+    text-align: center;
+    padding: 8px;
+}
+</style>
+
+<body>
+    <h1>Welkom bij Emi's kinderboerderij!</h1>
+    <p>Op deze pagina zien alle medewerkers de aanwezige dieren<br>
+    <ul>Wat kan ik als medewerker?
+           <li>Dier aan het bestand toevoegen</li>
+           <li>Dier uit het bestand halen</li>
+           <li>Leeftijd en gezondheid van het dier aanpassen</li>
+       </ul>
+
+    </p>
+
+    <table style="width:50%">
+        <tr>                                
+            <th>Naam</th>            
+            <th>Diersoort</th>
+            <th>Geslacht</th>
+            <th>Leeftijd</th>
+            <th>Gezondheid</th>
+        </tr>
+        <tr>          
+            <td>Black Betty</td>
+            <td>Schaap</td>   
+            <td>Vrouwtje</td>
+            <td>3 jaar</td>
+            <td>Geen bijzonderheden</td>
+        </tr>
+        <tr>
+            <td>Donald</td>
+            <td>Eend</td>
+            <td>Mannetje</td>
+            <td>2 jaar</td>
+            <td>Geen bijzonderheden</td>
+        </tr>
+        <tr>
+            <td>Billy</td>
+            <td>Geit</td>
+            <td>Mannetje</td>
+            <td>4 jaar</td>
+            <td>Krijgt medicatie</td>
+        </tr>
+    
+    </table>
+    <br>
+
+
+<div>
+   <form>
+        <label for="naam1">Naam: </label>
+        <input type="text" id="naam" placeholder="Typ hier de naam">
+        <label for="diersoort1">Diersoort: </label>
+        <input type="text"  id="diersoort" placeholder="Typ hier het diersoort">
+        <label for="geslacht1"> Geslacht: </label>
+        <input type="text" id="geslacht" placeholder="Typ hier het geslacht">
+        <label for="leeftijd1">Leeftijd: </label>
+        <input type="text" id="leeftijd" placeholder="Typ hier de leeftijd">
+        <label for="gezondheid1">Gezondheid: </label>
+        <input type="text" id="gezondheid" placeholder="Typ hier gezondheid">
+        <input type="button" value="Submit" onclick="postBoerderijDier()">
+    </form>
+</div>
+<div id="oink"></div>
+
+
+<script>
+
+    function showBoerderijDier(){
+            var bd = new XMLHttpRequest();
+            bd.onreadystatechange = function(){
+                console.log(this.responseText);
+                var boerderijdier = JSON.parse(this.responseText);
+                var string1 = "";
+                for(x=0; x<boerderijdier.length; x++){
+                    string1 += boerderijdier[x].id + " " + boerderijdier[x].naam + " , " + boerderijdier[x].diersoort + " , " + boerderijdier[x].geslacht + " , " + boerderijdier[x].leeftijd + " , " + boerderijdier[x].gezondheid + " <br>";
+                }
+                
+
+                document.getElementById("oink").innerHTML = string1;
+            }
+            bd.open("GET", "http://localhost:8082/boerderijdier", true);
+            bd.send();
+        }
+
+       
+
+    function postBoerderijDier(){
+        var diersoort = document.getElementById('diersoort').value;
+        var naam = document.getElementById('naam').value;
+        var geslacht = document.getElementById('geslacht').value;
+        var leeftijd = document.getElementById('leeftijd').value;
+        var gezondheid = document.getElementById('gezondheid').value;
+
+        var boerderijdier = {};
+        boerderijdier.diersoort = diersoort;
+        boerderijdier.naam = naam;
+        boerderijdier.geslacht = geslacht;
+        boerderijdier.leeftijd = leeftijd;
+        boerderijdier.gezondheid = gezondheid;
+
+        var bd = JSON.stringify(boerderijdier);
+       
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function(){
+            document.getElementById("oink").innerHTML = this.responseText;
+            showBoerderijDier();
+        }
+        xhr.open("POST", "http://localhost:8082/boerderijdier", true);
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.send(bd);
+    }
+    
+    window.onload = showBoerderijDier;
+
+</script>
+
+
+
+
+</body>
+</html>
