@@ -22,11 +22,13 @@ public class BoerderijDierService {
 		return bdr.save(boerderijdier);
 	}
 	
-//	public Iterable<BoerderijDier> getAllBoerderijDier() {
-//		Iterable<BoerderijDier> boerderijDier;
-//		boerderijDier = bdr.findAll();
-//		return boerderijDier;
-//		
-//	}
-	
+	public void deleteBoerderijDier(Long boerderijDierId) {
+		System.out.println("Boerderijdier verwijderd uit Database");
+		bdr.deleteById(boerderijDierId);
+	}
+
+	public BoerderijDier updateBoerderijDier(Long boerderijdierId, BoerderijDier boerderijdierDetails) {
+		BoerderijDier boerderijdier = bdr.findById(boerderijdierId).get();
+		return bdr.save(boerderijdier);
+	}
 }
