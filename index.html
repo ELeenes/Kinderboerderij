@@ -75,13 +75,18 @@ th, td {
     </form>
 </div>
 
-<div id="oink"></div>
-
 <div id="verwijderOink">
     <input type="text" id="delDier" placeholder="Typ hier het ID van het dier">
-    <button id="del" onclick="deleteBoerderijDier()">Haal het dier met de ID uit de database</button>
+    <button id="del" onclick="deleteBoerderijDier()">Verwijder het dier met deze ID</button>
 </div>
+<br>
 
+<div id="updateOink">
+    <input type="text" id="upOink" placeholder="Typ hier het ID van het dier">
+    <button id="update" onclick="changeBoerderijDier()">Verander dier met deze ID</button>
+</div><br>
+
+<div id="oink"></div>
 
 <script>
 
@@ -94,8 +99,6 @@ th, td {
                 for(x=0; x<boerderijdier.length; x++){
                     string1 += boerderijdier[x].id + " " + boerderijdier[x].naam + " , " + boerderijdier[x].diersoort + " , " + boerderijdier[x].geslacht + " , " + boerderijdier[x].leeftijd + " , " + boerderijdier[x].gezondheid + " <br>";
                 }
-                
-
                 document.getElementById("oink").innerHTML = string1;
                 
             }
@@ -145,6 +148,29 @@ th, td {
         }
         xhr.send();
     }
+
+
+    //werkt, maar veranderd naam, diersoort en geslacht naar null  --- TODO alle variabelen toevoegen
+    function changeBoerderijDier() {                                           
+                var url = "http://localhost:8082/boerderijdier/";
+                var input = document.getElementById('upOink').value;
+                var boerderijdier = {
+                    leeftijd : document.getElementById('leeftijd').value,
+                    gezondheid : document.getElementById('gezondheid').value,
+                };
+                var bd = JSON.stringify(boerderijdier);
+
+                var xhr = new XMLHttpRequest();
+                xhr.open("PUT", url+input, true);
+                xhr.setRequestHeader('Content-type','application/json');
+                xhr.onload = function () {
+                    var users = JSON.parse(xhr.responseText);
+                }
+                xhr.onreadystatechange = function() {
+                    showBoerderijDier();
+                }
+                xhr.send(bd);
+            }
 
     window.onload = showBoerderijDier;
 
