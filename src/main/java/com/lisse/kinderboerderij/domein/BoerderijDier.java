@@ -11,7 +11,7 @@ public class BoerderijDier {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	
-	private String dierSoort;
+	private String diersoort;
 	private String geslacht;
 	private String naam;
 	public int leeftijd;
@@ -26,12 +26,12 @@ public class BoerderijDier {
 		this.id = id;
 	}
 	
-	public String getDierSoort() {
-		return dierSoort;
+	public String getDiersoort() {
+		return diersoort;
 	}
 	
-	public void setDierSoort(String dierSoort) {
-		this.dierSoort = dierSoort;
+	public void setDiersoort(String dierSoort) {
+		this.diersoort = dierSoort;
 	}
 	
 	public String getGeslacht() {

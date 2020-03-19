@@ -27,8 +27,9 @@ public class BoerderijDierService {
 		bdr.deleteById(boerderijDierId);
 	}
 
-	public BoerderijDier updateBoerderijDier(Long boerderijdierId, BoerderijDier boerderijdierDetails) {
+	public BoerderijDier updateBoerderijDier(Long boerderijdierId, BoerderijDier bdDetails) {
 		BoerderijDier boerderijdier = bdr.findById(boerderijdierId).get();
+		System.out.println("BoerderijDier aangepast in Databases");
 		return bdr.save(boerderijdier);
 	}
 }

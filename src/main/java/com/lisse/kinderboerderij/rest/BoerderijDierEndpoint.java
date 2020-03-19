@@ -1,6 +1,8 @@
 package com.lisse.kinderboerderij.rest;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired; 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -20,25 +22,32 @@ public class BoerderijDierEndpoint {
 	@Autowired
 	BoerderijDierService bds;
 	
-	@GetMapping("/getBoerderijDier")
+	@GetMapping("/boerderijdier")
 	public Iterable<BoerderijDier> verkrijgBoerderijDier() {
 		return bds.getAllBoerderijDieren();
 	}
 	
-	@PostMapping("/postBoerderijDier")
-	public BoerderijDier toevoegenBoerderijDier(@RequestBody BoerderijDier boerderijdier) {
-		return bds.addBoerderijDier(boerderijdier);
+	@PostMapping("/boerderijdier")
+	public void toevoegenBoerderijDier(@RequestBody BoerderijDier boerderijdier) {
+		bds.addBoerderijDier(boerderijdier);
 	}
-	@DeleteMapping("/delBoerderijDier/{id}")
+	@DeleteMapping("/boerderijdier/{id}")
 	public void verwijderBoerderijDier(@PathVariable(value = "id") String boerderijDierId) {
 	bds.deleteBoerderijDier(Long.parseLong(boerderijDierId));
 	}
 	
-	@PutMapping("/putBoerderijDier/{id}")
-	public BoerderijDier vernieuwBoerderijDier(@PathVariable(value = "id") String boerderijDierId, @RequestBody BoerderijDier boerderijdierDetails) {
-	return bds.updateBoerderijDier(Long.parseLong(boerderijDierId), boerderijdierDetails);
+//	@PutMapping("/boerderijdier/{id}")
+//	public BoerderijDier vernieuwBoerderijDier(@PathVariable(value = "id") String boerderijDierId, @RequestBody BoerderijDier bdDetails) {
+//	return bds.updateBoerderijDier(Long.parseLong(boerderijDierId), bdDetails);
+//	}
+	
+	@PutMapping("/boerderijdier/{id}")
+	public void updateBD(@PathVariable(value = "id") Long id, @Valid @RequestBody
+			BoerderijDier boerderijdier) {
+		boerderijdier.setId(id);
+		bds.addBoerderijDier(boerderijdier);
 	}
-
+	
 }
 
 
