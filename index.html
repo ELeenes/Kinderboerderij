@@ -4,14 +4,41 @@
 <title> Emi's Kinderboerderij</title>
 </head>
 <style>
-table, th, td {
-    border: 1px solid black;
-  }
-th, td {
-    border: 1px soli #dddddd;
-    text-align: center;
-    padding: 8px;
+.probeersel-outer{
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
 }
+
+.probeersel-outer.dier-id-wrapper {
+    width: 50px;
+  }
+  
+.probeersel-outer.dier-name-wrapper {
+    width: 150px;
+}
+  
+.probeersel-outer.dier-diersoort-wrapper {
+    width: 150px;
+}
+  
+.probeersel-outer.dier-leeftijd-wrapper {
+    width: 50px;
+}
+  
+.probeersel-outer.dier-geslacht-wrapper {
+    width: 150px;
+}
+
+.probeersel-outer.dier-gezondheid-wrapper {
+    width: 150px;
+}
+
 </style>
 
 <body>
@@ -20,45 +47,14 @@ th, td {
     <ul>Wat kan ik als medewerker?
            <li>Dier aan het bestand toevoegen</li>
            <li>Dier uit het bestand halen</li>
-           <li>Leeftijd en gezondheid van het dier aanpassen</li>
+           <li>Informatie van het dier aanpassen</li>
        </ul>
-
+       Dit zijn de dieren in de database:
     </p>
-
-    <table style="width:50%">
-        <tr>                                
-            <th>Naam</th>            
-            <th>Diersoort</th>
-            <th>Geslacht</th>
-            <th>Leeftijd</th>
-            <th>Gezondheid</th>
-        </tr>
-        <tr>          
-            <td>Black Betty</td>
-            <td>Schaap</td>   
-            <td>Vrouwtje</td>
-            <td>3 jaar</td>
-            <td>Geen bijzonderheden</td>
-        </tr>
-        <tr>
-            <td>Donald</td>
-            <td>Eend</td>
-            <td>Mannetje</td>
-            <td>2 jaar</td>
-            <td>Geen bijzonderheden</td>
-        </tr>
-        <tr>
-            <td>Billy</td>
-            <td>Geit</td>
-            <td>Mannetje</td>
-            <td>4 jaar</td>
-            <td>Krijgt medicatie</td>
-        </tr>
-    
-    </table>
-    <br>
-
-
+<div id="oink"></div>
+<div id="showOink"></div>
+<br><br>
+Een nieuw dier toevoegen:
 <div>
    <form>
         <label for="naam1">Naam: </label>
@@ -74,45 +70,79 @@ th, td {
         <input type="button" value="Submit" onclick="postBoerderijDier()">
     </form>
 </div>
-
-<div id="oink"></div>
-
+<br><br>
+Een dier verwijderen:
 <div id="verwijderOink">
     <input type="text" id="delDier" placeholder="Typ hier het ID van het dier">
     <button id="del" onclick="deleteBoerderijDier()">Haal het dier met de ID uit de database</button>
 </div>
+<br><br>
+De info van een dier aanpassen:
+<div id="updateOink">
+    <input type="text" id="upOink" placeholder="Typ hier het ID van het dier">
+    <button id="update" onclick="changeBoerderijDier()">Verander dier met deze ID</button>
+</div><br><br>
 
+Exporteren naar Excel:<br>
+<button onclick="exportTableToExcel('showOink', 'dieren')">Export</button>
 
 <script>
 
-    function showBoerderijDier(){
-            var bd = new XMLHttpRequest();
-            bd.onreadystatechange = function(){
-                console.log(this.responseText);
-                var boerderijdier = JSON.parse(this.responseText);
-                var string1 = "";
-                for(x=0; x<boerderijdier.length; x++){
-                    string1 += boerderijdier[x].id + " " + boerderijdier[x].naam + " , " + boerderijdier[x].diersoort + " , " + boerderijdier[x].geslacht + " , " + boerderijdier[x].leeftijd + " , " + boerderijdier[x].gezondheid + " <br>";
-                }
-                
+function showBoerderijDier(){
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        var parsedDieren = JSON.parse(this.responseText);
 
-                document.getElementById("oink").innerHTML = string1;
-                
+        var col = [];
+        for(var i=0; i<parsedDieren.length; i++){
+            for(var key in parsedDieren[i]){
+                if (col.indexOf(key) === -1){
+                    col.push(key);
+                }
             }
-            bd.open("GET", "http://localhost:8082/boerderijdier", true);
-            bd.send();
         }
 
-        function postBoerderijDier(){
-        var diersoort = document.getElementById('diersoort').value;
+        // create dynamic table
+        var mijnTabel = document.createElement("table");
+        mijnTabel.setAttribute("id", "mijnTabel2");
+
+        // create html table header row using the extracted headers above
+        var tr = mijnTabel.insertRow(-1);
+        
+        for(var i=0; i<col.length; i++){
+            var th = document.createElement("th");
+            th.innerHTML = col[i];
+            tr.appendChild(th);
+        }
+
+        // add JSON data to the table as rows
+        for(var i=0; i<parsedDieren.length; i++){
+            tr = mijnTabel.insertRow(-1);
+            for(var j=0; j<col.length; j++){
+                var tabCell = tr.insertCell(-1);
+                tabCell.innerHTML = parsedDieren[i][col[j]]
+            }
+        }
+
+        //add table with JSON to a container
+        var divContainer = document.getElementById("showOink");
+        divContainer.innerHTML = "";
+        divContainer.appendChild(mijnTabel);
+    }
+    xhr.open("GET", "http://localhost:8082/boerderijdier", true);
+    xhr.send();
+}
+        
+function postBoerderijDier(){
         var naam = document.getElementById('naam').value;
+        var diersoort = document.getElementById('diersoort').value;
         var geslacht = document.getElementById('geslacht').value;
         var leeftijd = document.getElementById('leeftijd').value;
         var gezondheid = document.getElementById('gezondheid').value;
 
         var boerderijdier = {};
-        boerderijdier.diersoort = diersoort;
         boerderijdier.naam = naam;
+        boerderijdier.diersoort = diersoort;
         boerderijdier.geslacht = geslacht;
         boerderijdier.leeftijd = leeftijd;
         boerderijdier.gezondheid = gezondheid;
@@ -129,7 +159,7 @@ th, td {
         xhr.send(bd);
     }
     
-    function deleteBoerderijDier(){
+function deleteBoerderijDier(){
         var deletebd = document.getElementById('delDier').value;
         var url = "http://localhost:8082/boerderijdier/";
         
@@ -146,8 +176,67 @@ th, td {
         xhr.send();
     }
 
-    window.onload = showBoerderijDier;
+function changeBoerderijDier() {                                           
+                var url = "http://localhost:8082/boerderijdier/";
+                var input = document.getElementById('upOink').value;
+                var boerderijdier = {
+                    diersoort : document.getElementById('diersoort').value,
+                    naam : document.getElementById('naam').value,
+                    geslacht : document.getElementById('geslacht').value,
+                    leeftijd : document.getElementById('leeftijd').value,
+                    gezondheid : document.getElementById('gezondheid').value,
+                };
 
+                var bd = JSON.stringify(boerderijdier);
+
+                var xhr = new XMLHttpRequest();
+                xhr.open("PUT", url+input, true);
+                xhr.setRequestHeader('Content-type','application/json');
+                xhr.onload = function () {
+                    var users = JSON.parse(xhr.responseText);
+                }
+                xhr.onreadystatechange = function() {
+                    showBoerderijDier();
+                }
+                xhr.send(bd);
+            }
+
+function exportTableToExcel(oink, filename = ''){
+    var downloadLink;
+    var dataType = 'application/vnd.ms-excel';
+    var tableSelect = document.getElementById(oink);
+    var tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
+    // basic URL encoding replacing spaces with their URL equivalent %20
+        
+    // Specify file name
+    filename = filename?filename+'.xls':'excel_data.xls';
+    
+    // Create download link element
+    downloadLink = document.createElement("a");  // a for anchor
+    
+    document.body.appendChild(downloadLink);
+    
+    if(navigator.msSaveOrOpenBlob){    // saves and opens your Blob
+        var blob = new Blob(['\ufeff', tableHTML], {
+            type: dataType
+        });
+        navigator.msSaveOrOpenBlob( blob, filename); // causes the browser to prompt the user to download the file
+    }else{
+        // Create a link to the file
+        downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
+    
+        // Setting the file name
+        downloadLink.download = filename;
+        
+        //triggering the function
+        downloadLink.click();
+    }
+}
+
+window.onload = showBoerderijDier;
+
+   
+    
 </script>
 </body>
 </html>

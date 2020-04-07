@@ -8,6 +8,7 @@ public class KinderboerderijApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(KinderboerderijApplication.class, args);
+		System.out.println("OINK");
 	}
 
 }

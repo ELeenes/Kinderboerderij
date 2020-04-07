@@ -36,10 +36,6 @@ public class BoerderijDierEndpoint {
 	bds.deleteBoerderijDier(Long.parseLong(boerderijDierId));
 	}
 	
-//	@PutMapping("/boerderijdier/{id}")
-//	public BoerderijDier vernieuwBoerderijDier(@PathVariable(value = "id") String boerderijDierId, @RequestBody BoerderijDier bdDetails) {
-//	return bds.updateBoerderijDier(Long.parseLong(boerderijDierId), bdDetails);
-//	}
 	
 	@PutMapping("/boerderijdier/{id}")
 	public void updateBD(@PathVariable(value = "id") Long id, @Valid @RequestBody
