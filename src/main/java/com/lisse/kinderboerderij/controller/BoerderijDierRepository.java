@@ -1,6 +1,6 @@
 package com.lisse.kinderboerderij.controller;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Component; 
 
 import com.lisse.kinderboerderij.domein.BoerderijDier;
 

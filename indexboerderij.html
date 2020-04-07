@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title> Emi's Kinderboerderij</title>
+</head>
+<style>
+.probeersel-outer{
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+}
+
+.probeersel-outer.dier-id-wrapper {
+    width: 50px;
+  }
+  
+.probeersel-outer.dier-name-wrapper {
+    width: 150px;
+}
+  
+.probeersel-outer.dier-diersoort-wrapper {
+    width: 150px;
+}
+  
+.probeersel-outer.dier-leeftijd-wrapper {
+    width: 50px;
+}
+  
+.probeersel-outer.dier-geslacht-wrapper {
+    width: 150px;
+}
+
+.probeersel-outer.dier-gezondheid-wrapper {
+    width: 150px;
+}
+
+</style>
+
+<body>
+    <h1>Welkom bij Emi's kinderboerderij!</h1>
+    <p>Op deze pagina zien alle medewerkers de aanwezige dieren<br>
+    <ul>Wat kan ik als medewerker?
+           <li>Dier aan het bestand toevoegen</li>
+           <li>Dier uit het bestand halen</li>
+           <li>Informatie van het dier aanpassen</li>
+       </ul>
+       Dit zijn de dieren in de database:
+    </p>
+<div id="oink"></div>
+<div id="showOink"></div>
+<br><br>
+Een nieuw dier toevoegen:
+<div>
+   <form>
+        <label for="naam1">Naam: </label>
+        <input type="text" id="naam" placeholder="Typ hier de naam">
+        <label for="diersoort1">Diersoort: </label>
+        <input type="text"  id="diersoort" placeholder="Typ hier het diersoort">
+        <label for="geslacht1"> Geslacht: </label>
+        <input type="text" id="geslacht" placeholder="Typ hier het geslacht">
+        <label for="leeftijd1">Leeftijd: </label>
+        <input type="text" id="leeftijd" placeholder="Typ hier de leeftijd">
+        <label for="gezondheid1">Gezondheid: </label>
+        <input type="text" id="gezondheid" placeholder="Typ hier gezondheid">
+        <input type="button" value="Submit" onclick="postBoerderijDier()">
+    </form>
+</div>
+<br><br>
+Een dier verwijderen:
+<div id="verwijderOink">
+    <input type="text" id="delDier" placeholder="Typ hier het ID van het dier">
+    <button id="del" onclick="deleteBoerderijDier()">Haal het dier met de ID uit de database</button>
+</div>
+<br><br>
+De info van een dier aanpassen:
+<div id="updateOink">
+    <input type="text" id="upOink" placeholder="Typ hier het ID van het dier">
+    <button id="update" onclick="changeBoerderijDier()">Verander dier met deze ID</button>
+</div><br><br>
+
+Exporteren naar Excel:<br>
+<button onclick="exportTableToExcel('showOink', 'dieren')">Export</button>
+
+<script>
+
+function showBoerderijDier(){
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        var parsedDieren = JSON.parse(this.responseText);
+
+        var col = [];
+        for(var i=0; i<parsedDieren.length; i++){
+            for(var key in parsedDieren[i]){
+                if (col.indexOf(key) === -1){
+                    col.push(key);
+                }
+            }
+        }
+
+        // create dynamic table
+        var mijnTabel = document.createElement("table");
+        mijnTabel.setAttribute("id", "mijnTabel2");
+
+        // create html table header row using the extracted headers above
+        var tr = mijnTabel.insertRow(-1);
+        
+        for(var i=0; i<col.length; i++){
+            var th = document.createElement("th");
+            th.innerHTML = col[i];
+            tr.appendChild(th);
+        }
+
+        // add JSON data to the table as rows
+        for(var i=0; i<parsedDieren.length; i++){
+            tr = mijnTabel.insertRow(-1);
+            for(var j=0; j<col.length; j++){
+                var tabCell = tr.insertCell(-1);
+                tabCell.innerHTML = parsedDieren[i][col[j]]
+            }
+        }
+
+        //add table with JSON to a container
+        var divContainer = document.getElementById("showOink");
+        divContainer.innerHTML = "";
+        divContainer.appendChild(mijnTabel);
+    }
+    xhr.open("GET", "http://localhost:8082/boerderijdier", true);
+    xhr.send();
+}
+        
+function postBoerderijDier(){
+        var naam = document.getElementById('naam').value;
+        var diersoort = document.getElementById('diersoort').value;
+        var geslacht = document.getElementById('geslacht').value;
+        var leeftijd = document.getElementById('leeftijd').value;
+        var gezondheid = document.getElementById('gezondheid').value;
+
+        var boerderijdier = {};
+        boerderijdier.naam = naam;
+        boerderijdier.diersoort = diersoort;
+        boerderijdier.geslacht = geslacht;
+        boerderijdier.leeftijd = leeftijd;
+        boerderijdier.gezondheid = gezondheid;
+
+        var bd = JSON.stringify(boerderijdier);
+       
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function(){
+            document.getElementById("oink").innerHTML = this.responseText;
+            showBoerderijDier();
+        }
+        xhr.open("POST", "http://localhost:8082/boerderijdier", true);
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.send(bd);
+    }
+    
+function deleteBoerderijDier(){
+        var deletebd = document.getElementById('delDier').value;
+        var url = "http://localhost:8082/boerderijdier/";
+        
+        var xhr = new XMLHttpRequest();
+        
+        xhr.open("DELETE", url+deletebd, true);
+        xhr.onload = function(){
+            var boerderijdier = JSON.parse(xhr.responseText);
+        }
+
+        xhr.onreadystatechange = function() {
+            showBoerderijDier();
+        }
+        xhr.send();
+    }
+
+function changeBoerderijDier() {                                           
+                var url = "http://localhost:8082/boerderijdier/";
+                var input = document.getElementById('upOink').value;
+                var boerderijdier = {
+                    diersoort : document.getElementById('diersoort').value,
+                    naam : document.getElementById('naam').value,
+                    geslacht : document.getElementById('geslacht').value,
+                    leeftijd : document.getElementById('leeftijd').value,
+                    gezondheid : document.getElementById('gezondheid').value,
+                };
+
+                var bd = JSON.stringify(boerderijdier);
+
+                var xhr = new XMLHttpRequest();
+                xhr.open("PUT", url+input, true);
+                xhr.setRequestHeader('Content-type','application/json');
+                xhr.onload = function () {
+                    var users = JSON.parse(xhr.responseText);
+                }
+                xhr.onreadystatechange = function() {
+                    showBoerderijDier();
+                }
+                xhr.send(bd);
+            }
+
+function exportTableToExcel(oink, filename = ''){
+    var downloadLink;
+    var dataType = 'application/vnd.ms-excel';
+    var tableSelect = document.getElementById(oink);
+    var tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
+    // basic URL encoding replacing spaces with their URL equivalent %20
+        
+    // Specify file name
+    filename = filename?filename+'.xls':'excel_data.xls';
+    
+    // Create download link element
+    downloadLink = document.createElement("a");  // a for anchor
+    
+    document.body.appendChild(downloadLink);
+    
+    if(navigator.msSaveOrOpenBlob){    // saves and opens your Blob
+        var blob = new Blob(['\ufeff', tableHTML], {
+            type: dataType
+        });
+        navigator.msSaveOrOpenBlob( blob, filename); // causes the browser to prompt the user to download the file
+    }else{
+        // Create a link to the file
+        downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
+    
+        // Setting the file name
+        downloadLink.download = filename;
+        
+        //triggering the function
+        downloadLink.click();
+    }
+}
+
+window.onload = showBoerderijDier;
+
+   
+    
+</script>
+</body>
+</html>

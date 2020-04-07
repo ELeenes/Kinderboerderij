@@ -1,6 +1,6 @@
 package com.lisse.kinderboerderij.rest;
 
-import javax.validation.Valid;
+import javax.validation.Valid; 
 
 import org.springframework.beans.factory.annotation.Autowired; 
 import org.springframework.web.bind.annotation.DeleteMapping;
